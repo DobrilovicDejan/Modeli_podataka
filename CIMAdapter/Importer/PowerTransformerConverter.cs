@@ -1,6 +1,8 @@
 ﻿namespace FTN.ESI.SIMES.CIM.CIMAdapter.Importer
 {
 	using FTN.Common;
+    using System;
+    using System.Threading.Tasks;
 
 	/// <summary>
 	/// PowerTransformerConverter has methods for populating
@@ -10,25 +12,134 @@
 	{
 
 		#region Populate ResourceDescription
+
 		public static void PopulateIdentifiedObjectProperties(FTN.IdentifiedObject cimIdentifiedObject, ResourceDescription rd)
 		{
-			if ((cimIdentifiedObject != null) && (rd != null))
+
+		}
+
+		public static void PopulatePowerSystemResourceProperties(FTN.PowerSystemResource cimPowerSystemResource, ResourceDescription rd)
+		{
+			if ((cimPowerSystemResource != null) && (rd != null))
 			{
-				if (cimIdentifiedObject.MRIDHasValue)
+				PowerTransformerConverter.PopulateIdentifiedObjectProperties(cimPowerSystemResource, rd);
+			}
+		}
+
+		public static void PopulateConnectivityNodeProperties(FTN.ConnectivityNode cimConnectivityNode, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((cimConnectivityNode != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateIdentifiedObjectProperties(cimConnectivityNode, rd);
+
+				if (cimConnectivityNode.DescriptionHasValue)
 				{
-					rd.AddProperty(new Property(ModelCode.IDOBJ_MRID, cimIdentifiedObject.MRID));
+					rd.AddProperty(new Property(ModelCode.CONNECTIVITYNODE_DESCRIPTION, cimConnectivityNode.Description));
 				}
-				if (cimIdentifiedObject.NameHasValue)
+				if (cimConnectivityNode.ConnectivityNodeContainerHasValue)
 				{
-					rd.AddProperty(new Property(ModelCode.IDOBJ_NAME, cimIdentifiedObject.Name));
-				}
-				if (cimIdentifiedObject.DescriptionHasValue)
-				{
-					rd.AddProperty(new Property(ModelCode.IDOBJ_DESCRIPTION, cimIdentifiedObject.Description));
+					long gid = importHelper.GetMappedGID(cimConnectivityNode.ConnectivityNodeContainer.ID);
+					if (gid > 0)
+					{
+						report.Report.Append("WARNING: Convert ").Append(cimConnectivityNode.GetType().ToString()).Append(" rdfID = \"").Append(cimConnectivityNode.ID);
+						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimConnectivityNode.ConnectivityNodeContainer.ID).AppendLine(" \" is not mapped to GID!");
+					}
+					rd.AddProperty(new Property(ModelCode.CONNECTIVITYNODE_CNCONTAINER, gid));
 				}
 			}
 		}
 
+		public static void PopulateTerminalProperties(FTN.Terminal cimTerminal, ResourceDescription rd, ImportHelper importerHelper, TransformAndLoadReport report)
+		{
+			if ((cimTerminal != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateIdentifiedObjectProperties(cimTerminal, rd);
+
+				if (cimTerminal.ConductingEquipmentHasValue)
+				{
+					long gid = importerHelper.GetMappedGID(cimTerminal.ConductingEquipment.ID);
+					if (gid > 0)
+					{
+						report.Report.Append("WARNING: Convert ").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
+						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimTerminal.ConductingEquipment.ID).AppendLine(" \" is not mapped to GID!");
+					}
+					rd.AddProperty(new Property(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT, gid));
+				}
+				if (cimTerminal.ConnectivityNodeHasValue)
+				{
+					long gid = importerHelper.GetMappedGID(cimTerminal.ConnectivityNode.ID);
+					if (gid > 0)
+					{
+						report.Report.Append("WARNING: Convert ").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
+						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimTerminal.ConnectivityNode.ID).AppendLine(" \" is not mapped to GID!");
+					}
+					rd.AddProperty(new Property(ModelCode.TERMINAL_CONNECTIVITYNODE, gid));
+				}
+            }
+
+        }
+
+        public static void PopulateEquipmentProperties(FTN.Equipment equipment, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((equipment != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulatePowerSystemResourceProperties(equipment, rd);
+
+				if (equipment.EquipmentContainerHasValue)
+				{
+					long gid = importHelper.GetMappedGID(equipment.EquipmentContainer.ID);
+					if (gid > 0)
+					{
+						report.Report.Append("WARNING: Convert ").Append(equipment.GetType().ToString()).Append(" rdfID = \"").Append(equipment.ID);
+						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(equipment.EquipmentContainer.ID).AppendLine(" \" is not mapped to GID!");
+					}
+					rd.AddProperty(new Property(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT, gid));
+				}
+			}
+		}
+
+		public static void PopulateConnectivityNodeContainerProperties(FTN.ConnectivityNodeContainer connectivityNodeContainer, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((connectivityNodeContainer != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulatePowerSystemResourceProperties(connectivityNodeContainer, rd);
+			}
+		}
+
+		public static void PopulateConductingEquipmentProperties(FTN.ConductingEquipment conductingEquipment, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((conductingEquipment != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateEquipmentProperties(conductingEquipment, rd, importHelper, report);
+			}
+		}
+
+
+		public static void PopulateEquipmentContainerProperties(FTN.EquipmentContainer equipmentContainer, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((equipmentContainer != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateConnectivityNodeContainerProperties(equipmentContainer, rd, importHelper, report);
+			}
+		}
+
+		public static void PopulateBayProperties(FTN.Bay cimBay, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if((cimBay != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateEquipmentContainerProperties(cimBay, rd, importHelper, report);
+
+
+			}
+		}
+
+
+
+
+
+
+
+        /*
 		public static void PopulateLocationProperties(FTN.Location cimLocation, ResourceDescription rd)
 		{
 			if ((cimLocation != null) && (rd != null))
@@ -237,95 +348,12 @@
 				}
 			}
 		}
-		#endregion Populate ResourceDescription
+		*/
 
-		#region Enums convert
-		public static PhaseCode GetDMSPhaseCode(FTN.PhaseCode phases)
-		{
-			switch (phases)
-			{
-				case FTN.PhaseCode.A:
-					return PhaseCode.A;
-				case FTN.PhaseCode.AB:
-					return PhaseCode.AB;
-				case FTN.PhaseCode.ABC:
-					return PhaseCode.ABC;
-				case FTN.PhaseCode.ABCN:
-					return PhaseCode.ABCN;
-				case FTN.PhaseCode.ABN:
-					return PhaseCode.ABN;
-				case FTN.PhaseCode.AC:
-					return PhaseCode.AC;
-				case FTN.PhaseCode.ACN:
-					return PhaseCode.ACN;
-				case FTN.PhaseCode.AN:
-					return PhaseCode.AN;
-				case FTN.PhaseCode.B:
-					return PhaseCode.B;
-				case FTN.PhaseCode.BC:
-					return PhaseCode.BC;
-				case FTN.PhaseCode.BCN:
-					return PhaseCode.BCN;
-				case FTN.PhaseCode.BN:
-					return PhaseCode.BN;
-				case FTN.PhaseCode.C:
-					return PhaseCode.C;
-				case FTN.PhaseCode.CN:
-					return PhaseCode.CN;
-				case FTN.PhaseCode.N:
-					return PhaseCode.N;
-				case FTN.PhaseCode.s12N:
-					return PhaseCode.ABN;
-				case FTN.PhaseCode.s1N:
-					return PhaseCode.AN;
-				case FTN.PhaseCode.s2N:
-					return PhaseCode.BN;
-				default: return PhaseCode.Unknown;
-			}
-		}
 
-		public static TransformerFunction GetDMSTransformerFunctionKind(FTN.TransformerFunctionKind transformerFunction)
-		{
-			switch (transformerFunction)
-			{
-				case FTN.TransformerFunctionKind.voltageRegulator:
-					return TransformerFunction.Voltreg;
-				default:
-					return TransformerFunction.Consumer;
-			}
-		}
 
-		public static WindingType GetDMSWindingType(FTN.WindingType windingType)
-		{
-			switch (windingType)
-			{
-				case FTN.WindingType.primary:
-					return WindingType.Primary;
-				case FTN.WindingType.secondary:
-					return WindingType.Secondary;
-				case FTN.WindingType.tertiary:
-					return WindingType.Tertiary;
-				default:
-					return WindingType.None;
-			}
-		}
+        #endregion Populate ResourceDescription
 
-		public static WindingConnection GetDMSWindingConnection(FTN.WindingConnection windingConnection)
-		{
-			switch (windingConnection)
-			{
-				case FTN.WindingConnection.D:
-					return WindingConnection.D;
-				case FTN.WindingConnection.I:
-					return WindingConnection.I;
-				case FTN.WindingConnection.Z:
-					return WindingConnection.Z;
-				case FTN.WindingConnection.Y:
-					return WindingConnection.Y;
-				default:
-					return WindingConnection.Y;
-			}
-		}
-		#endregion Enums convert
-	}
+
+    }
 }

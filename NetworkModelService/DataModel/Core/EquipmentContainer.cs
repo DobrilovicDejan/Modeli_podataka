@@ -13,7 +13,7 @@ namespace FTN {
     using FTN;
     
     
-    /// A power system resource can be an item of equipment such as a switch, an equipment container containing many individual items of equipment such as a substation, or an organisational entity such as sub-control area. Power system resources can have measurements associated.
-    public class PowerSystemResource : IdentifiedObject {
+    /// A modeling construct to provide a root class for containing equipment.
+    public class EquipmentContainer : ConnectivityNodeContainer {
     }
 }
