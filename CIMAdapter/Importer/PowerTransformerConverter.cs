@@ -129,10 +129,103 @@
 			{
 				PowerTransformerConverter.PopulateEquipmentContainerProperties(cimBay, rd, importHelper, report);
 
+				if(cimBay.BayEnergyMeasFlagHasValue)
+				{
+					rd.AddProperty(new Property(ModelCode.BAY_BAYENERGYMEASFLAG, cimBay.BayEnergyMeasFlag));
+				}
+                if (cimBay.BayPowerMeasFlagHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.BAY_BAYPOWERMEASFLAG, cimBay.BayPowerMeasFlag));
+                }
+            }
+		}
 
+        public static void PopulateConductorProperties(FTN.Conductor conductor, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if ((conductor != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateConductingEquipmentProperties(conductor, rd, importHelper, report);
+
+				if(conductor.LengthHasValue)
+				{
+					rd.AddProperty(new Property(ModelCode.CONDUCTOR_LENGTH, conductor.Length));
+				}
 			}
 		}
 
+        public static void PopulateSeriesCompensatorProperties(FTN.SeriesCompensator seriesCompensator, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if((seriesCompensator != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateConductingEquipmentProperties(seriesCompensator, rd, importHelper, report);
+
+				if(seriesCompensator.RHasValue) 
+				{
+					rd.AddProperty(new Property(ModelCode.SERIESCOMPENSATOR_R, seriesCompensator.R));
+				}
+				if(seriesCompensator.R0HasValue) 
+				{ 
+					rd.AddProperty(new Property(ModelCode.SERIESCOMPENSATOR_R0, seriesCompensator.R0));
+                }
+                if (seriesCompensator.XHasValue)
+				{
+                    rd.AddProperty(new Property(ModelCode.SERIESCOMPENSATOR_X, seriesCompensator.X));
+                }
+                if (seriesCompensator.X0HasValue)
+				{
+					rd.AddProperty(new Property(ModelCode.SERIESCOMPENSATOR_X0, seriesCompensator.X0));
+                }
+            }
+		}
+
+        public static void PopulateDCLineSegmentProperties(FTN.DCLineSegment dCLineSegment, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+			if((dCLineSegment != null) && (rd != null))
+			{
+				PowerTransformerConverter.PopulateConductorProperties(dCLineSegment, rd, importHelper, report);
+			}
+		}
+
+        public static void PopulateACLineSegmentProperties(FTN.ACLineSegment aCLineSegment, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
+		{
+            if ((aCLineSegment != null) && (rd != null))
+            {
+                PowerTransformerConverter.PopulateConductorProperties(aCLineSegment, rd, importHelper, report);
+
+                if (aCLineSegment.B0chHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_BOCH, aCLineSegment.B0ch));
+                }
+                if (aCLineSegment.BchHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_BCH, aCLineSegment.Bch));
+                }
+                if (aCLineSegment.G0chHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_GOCH, aCLineSegment.G0ch));
+                }
+                if (aCLineSegment.GchHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_GCH, aCLineSegment.Gch));
+                }
+                if (aCLineSegment.RHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_R, aCLineSegment.R));
+                }
+                if (aCLineSegment.R0HasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_R0, aCLineSegment.R0));
+                }
+                if (aCLineSegment.XHasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_X, aCLineSegment.X));
+                }
+                if (aCLineSegment.X0HasValue)
+                {
+                    rd.AddProperty(new Property(ModelCode.ACLINESEGMENT_X0, aCLineSegment.X0));
+                }
+            }
+        }
 
 
 
