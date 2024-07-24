@@ -90,9 +90,7 @@
     <Compile Include="Core\ConnectivityNodeContainer.cs" />
     <Compile Include="Core\Equipment.cs" />
     <Compile Include="Core\EquipmentContainer.cs" />
-    <Compile Include="Core\IDClass.cs" />
     <Compile Include="Core\IdentifiedObject.cs" />
-    <Compile Include="Core\Location.cs" />
     <Compile Include="Core\PowerSystemResource.cs" />
     <Compile Include="Core\Terminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

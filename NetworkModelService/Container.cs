@@ -122,24 +122,30 @@ namespace FTN.Services.NetworkModelService
 			IdentifiedObject io = null;			
 			switch ((DMSType)type)
 			{
-				case DMSType.BASEVOLTAGE:
-					io = new BaseVoltage(globalId);
-					break;
+                case DMSType.DCLINESEGMENT:
+                    io = new DCLineSegment(globalId);
+                    break;
 
-				case DMSType.LOCATION:
-					io = new Location(globalId);
-					break;
-				case DMSType.POWERTR:
-					io = new PowerTransformer(globalId);
-					break;
-				case DMSType.POWERTRWINDING:
-					io = new TransformerWinding(globalId);
-					break;
-				case DMSType.WINDINGTEST:
-					io = new WindingTest(globalId);
-					break;			
+                case DMSType.ACLINESEGMENT:
+                    io = new ACLineSegment(globalId);
+                    break;
 
-				default:					
+                case DMSType.BAY:
+                    io = new Bay(globalId);
+                    break;
+
+                case DMSType.SERIESCOMPENSATOR:
+                    io = new SeriesCompensator(globalId);
+                    break;
+
+                case DMSType.CONNECTIVITYNODE:
+                    io = new ConnectivityNode(globalId);
+                    break;
+
+                case DMSType.TERMINAL:
+                    io = new Terminal(globalId);
+                    break;
+                default:					
 					string message = String.Format("Failed to create entity because specified type ({0}) is not supported.", type);
 					CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 					throw new Exception(message);					
