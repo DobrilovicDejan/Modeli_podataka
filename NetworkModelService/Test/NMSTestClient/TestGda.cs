@@ -164,6 +164,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 			try
 			{						
 				List<ModelCode> properties = new List<ModelCode>();
+                properties.Add(ModelCode.IDOBJ_GID);
 						
 				int iteratorId = GdaQueryProxy.GetRelatedValues(sourceGlobalId, properties, association);
 				int resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
@@ -757,5 +758,175 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 		{
 			GC.SuppressFinalize(this);
 		}
-	}
+
+        #region MINE
+
+        public void ComplexMethod()
+        {
+            try
+            {
+
+                List<long> nodes = GetECs();
+
+                foreach(long node in nodes)
+                {
+                    Console.WriteLine($"Equipment ID: {node}");
+
+                    List<long> equipments = GetEquipmentFor(node);
+
+                    foreach (long equipment in equipments)
+                    {
+                        Console.WriteLine($"Terminal ID: {equipment}");
+
+
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                string message = $"Displaying equipments in Equipment Containers failed: {e.Message}";
+                Console.WriteLine(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            }
+        }
+
+        private List<long> GetECs()
+        {
+            ModelCode modelCode = ModelCode.EQUIPMENTCONTAINER;
+
+            string message = "Getting equipment containers.";
+            Console.WriteLine(message);
+            CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+
+
+            XmlTextWriter xmlWriter = null;
+            int iteratorId = 0;
+            List<long> ids = new List<long>();
+
+            try
+            {
+                int numberOfResources = 2;
+                int resourcesLeft = 0;
+
+                List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(modelCode);
+
+                iteratorId = GdaQueryProxy.GetExtentValues(modelCode, properties);
+                resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+
+                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\EquipmentContainer_results.xml", Encoding.Unicode);
+                xmlWriter.Formatting = Formatting.Indented;
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> rds = GdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+                    for (int i = 0; i < rds.Count; i++)
+                    {
+                        ids.Add(rds[i].Id);
+                        rds[i].ExportToXml(xmlWriter);
+                        xmlWriter.Flush();
+                    }
+
+                    resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                }
+
+                GdaQueryProxy.IteratorClose(iteratorId);
+
+                message = "Successfully finished getting Equipment Containers";
+                Console.WriteLine(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+
+            }
+            catch (Exception e)
+            {
+                message = string.Format("Getting Equipment Containers failed for {0}.\n\t{1}", modelCode, e.Message);
+                Console.WriteLine(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            }
+            finally
+            {
+                if (xmlWriter != null)
+                {
+                    xmlWriter.Close();
+                }
+            }
+
+            return ids;
+
+        }
+
+
+        private List<long> GetEquipmentFor(long sourceGID)
+        {
+            Association association = new Association()
+            {
+                PropertyId = ModelCode.EQUIPMENTCONTAINER_EQUIPMENTS,
+                Type = ModelCode.EQUIPMENT
+            };
+
+            string message = "Getting Equipments in Equipment Containers.";
+            Console.WriteLine(message);
+            CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+
+            List<long> resultIds = new List<long>();
+
+
+            XmlTextWriter xmlWriter = null;
+            int numberOfResources = 2;
+
+            try
+            {
+                List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCode.EQUIPMENT);
+
+                int iteratorId = GdaQueryProxy.GetRelatedValues(sourceGID, properties, association);
+                int resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
+
+                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\Equipments_Results.xml", Encoding.Unicode);
+                xmlWriter.Formatting = Formatting.Indented;
+
+                while (resourcesLeft > 0)
+                {
+                    List<ResourceDescription> rds = GdaQueryProxy.IteratorNext(numberOfResources, iteratorId);
+
+                    for (int i = 0; i < rds.Count; i++)
+                    {
+                        resultIds.Add(rds[i].Id);
+                        rds[i].ExportToXml(xmlWriter);
+                        xmlWriter.Flush();
+                    }
+
+                    resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
+                }
+
+                GdaQueryProxy.IteratorClose(iteratorId);
+
+                message = "Getting Equipments successfully finished.";
+                Console.WriteLine(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            }
+            catch (Exception e)
+            {
+                message = string.Format("Getting equipment for GlobalId = {0} and association (propertyId = {1}, type = {2}). Reason: {3}", sourceGID, association.PropertyId, association.Type, e.Message);
+                Console.WriteLine(message);
+                CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+            }
+            finally
+            {
+                if (xmlWriter != null)
+                {
+                    xmlWriter.Close();
+                }
+            }
+
+            return resultIds;
+        }
+
+
+
+
+
+        #endregion MINE
+
+    }
 }

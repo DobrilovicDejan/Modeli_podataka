@@ -109,7 +109,21 @@ namespace FTN.Services.NetworkModelService.TestClient
                             CommonTrace.WriteTrace(CommonTrace.TraceError, message);
                         }
                     }
-					else if (str != "q")
+                    else if (str == "5")
+                    {
+                        try
+                        {
+                            Console.WriteLine("Connectivity Node Terminals:");
+                            tgda.ComplexMethod();
+                        }
+                        catch (Exception ex)
+                        {
+                            message = string.Format("You know about Hiroshima, yeah, this is simmilar problem: {0}", ex.Message);
+                            Console.WriteLine(message);
+                            CommonTrace.WriteTrace(CommonTrace.TraceError, message);
+                        }
+                    }
+                    else if (str != "q")
 					{
 						PrintUnknownOption();
 					}
@@ -131,12 +145,15 @@ namespace FTN.Services.NetworkModelService.TestClient
 
 		private static void PrintMenu()
 		{
-			Console.WriteLine("\nChoose tests type:");
-			Console.WriteLine("\t1) Get values");
-			Console.WriteLine("\t2) Get extent values");
-			Console.WriteLine("\t3) Get related values");
-            Console.WriteLine("\t4) Test apply update");
-			Console.WriteLine("\tq) Quit");
+            Console.WriteLine("==============================================");
+            Console.WriteLine("\nChoose tests type:");
+			Console.WriteLine("\t(1) Get values");
+			Console.WriteLine("\t(2) Get extent values");
+			Console.WriteLine("\t(3) Get related values");
+            Console.WriteLine("\t(4) Test apply update");
+            Console.WriteLine("\t(5) ConnectivityNode Terminals list");
+            Console.WriteLine("\t(q) Quit");
+            Console.WriteLine("\t-----------------------------------");
 		}
 
         #region Help methods
