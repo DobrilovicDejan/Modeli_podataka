@@ -18,7 +18,7 @@
 
 		}
 
-		public static void PopulatePowerSystemResourceProperties(FTN.PowerSystemResource cimPowerSystemResource, ResourceDescription rd)
+		public static void PopulatePowerSystemResourceProperties(FTN.PowerSystemResource cimPowerSystemResource, ResourceDescription rd, ImportHelper importHelper, TransformAndLoadReport report)
 		{
 			if ((cimPowerSystemResource != null) && (rd != null))
 			{
@@ -42,7 +42,7 @@
 					if (gid > 0)
 					{
 						report.Report.Append("WARNING: Convert ").Append(cimConnectivityNode.GetType().ToString()).Append(" rdfID = \"").Append(cimConnectivityNode.ID);
-						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimConnectivityNode.ConnectivityNodeContainer.ID).AppendLine(" \" is not mapped to GID!");
+						report.Report.Append("\" - Failed to set reference to ConnectivityNode Container: rdfID \"").Append(cimConnectivityNode.ConnectivityNodeContainer.ID).AppendLine(" \" is not mapped to GID!");
 					}
 					rd.AddProperty(new Property(ModelCode.CONNECTIVITYNODE_CNCONTAINER, gid));
 				}
@@ -61,7 +61,7 @@
 					if (gid > 0)
 					{
 						report.Report.Append("WARNING: Convert ").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
-						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimTerminal.ConductingEquipment.ID).AppendLine(" \" is not mapped to GID!");
+						report.Report.Append("\" - Failed to set reference to Conducting Equipment: rdfID \"").Append(cimTerminal.ConductingEquipment.ID).AppendLine(" \" is not mapped to GID!");
 					}
 					rd.AddProperty(new Property(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT, gid));
 				}
@@ -71,7 +71,7 @@
 					if (gid > 0)
 					{
 						report.Report.Append("WARNING: Convert ").Append(cimTerminal.GetType().ToString()).Append(" rdfID = \"").Append(cimTerminal.ID);
-						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(cimTerminal.ConnectivityNode.ID).AppendLine(" \" is not mapped to GID!");
+						report.Report.Append("\" - Failed to set reference to Connectivity Node: rdfID \"").Append(cimTerminal.ConnectivityNode.ID).AppendLine(" \" is not mapped to GID!");
 					}
 					rd.AddProperty(new Property(ModelCode.TERMINAL_CONNECTIVITYNODE, gid));
 				}
@@ -83,7 +83,7 @@
 		{
 			if ((equipment != null) && (rd != null))
 			{
-				PowerTransformerConverter.PopulatePowerSystemResourceProperties(equipment, rd);
+				PowerTransformerConverter.PopulatePowerSystemResourceProperties(equipment, rd, importHelper, report);
 
 				if (equipment.EquipmentContainerHasValue)
 				{
@@ -91,7 +91,7 @@
 					if (gid > 0)
 					{
 						report.Report.Append("WARNING: Convert ").Append(equipment.GetType().ToString()).Append(" rdfID = \"").Append(equipment.ID);
-						report.Report.Append("\" - Failed to set reference to IntervalSchedule: rdfID \"").Append(equipment.EquipmentContainer.ID).AppendLine(" \" is not mapped to GID!");
+						report.Report.Append("\" - Failed to set reference to Equipment Container: rdfID \"").Append(equipment.EquipmentContainer.ID).AppendLine(" \" is not mapped to GID!");
 					}
 					rd.AddProperty(new Property(ModelCode.TERMINAL_CONDUCTINGEQUIPMENT, gid));
 				}
@@ -102,7 +102,7 @@
 		{
 			if ((connectivityNodeContainer != null) && (rd != null))
 			{
-				PowerTransformerConverter.PopulatePowerSystemResourceProperties(connectivityNodeContainer, rd);
+				PowerTransformerConverter.PopulatePowerSystemResourceProperties(connectivityNodeContainer, rd, importHelper, report);
 			}
 		}
 

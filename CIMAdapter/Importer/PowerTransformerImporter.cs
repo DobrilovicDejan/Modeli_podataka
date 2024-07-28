@@ -101,12 +101,12 @@ namespace FTN.ESI.SIMES.CIM.CIMAdapter.Importer
 			ImportWindingTests();
 			*/
 
+			ImportTerminal();
+			ImportSeriesCompensator();
+			ImportConnectivityNode();
 			ImportDCLineSegment();
 			ImportACLineSegment();
 			ImportBay();
-			ImportSeriesCompensator();
-			ImportConnectivityNode();
-			ImportTerminal();
 
 			LogManager.Log("Loading elements and creating delta completed.", LogLevel.Info);
 		}

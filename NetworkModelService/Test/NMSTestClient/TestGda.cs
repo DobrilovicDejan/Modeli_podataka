@@ -763,20 +763,21 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 
         public void ComplexMethod()
         {
+            //Console.WriteLine("Complex Method started:");
             try
             {
 
-                List<long> nodes = GetECs();
+                List<long> nodes = GetCNs();
 
                 foreach(long node in nodes)
                 {
-                    Console.WriteLine($"Equipment ID: {node}");
+                    Console.WriteLine($"Connecting Node ID: {node}");
 
-                    List<long> equipments = GetEquipmentFor(node);
+                    List<long> terminals = GetTerminalsFor(node);
 
-                    foreach (long equipment in equipments)
+                    foreach (long terminal in terminals)
                     {
-                        Console.WriteLine($"Terminal ID: {equipment}");
+                        Console.WriteLine($"Terminal ID: {terminal}");
 
 
                     }
@@ -790,12 +791,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
             }
         }
 
-        private List<long> GetECs()
+        private List<long> GetCNs()
         {
-            ModelCode modelCode = ModelCode.EQUIPMENTCONTAINER;
+            ModelCode modelCode = ModelCode.CONNECTIVITYNODE;
 
-            string message = "Getting equipment containers.";
-            Console.WriteLine(message);
+            string message = "Getting connectivity nodes.";
+            //Console.WriteLine(message);
             CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
 
@@ -814,7 +815,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
                 resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
 
 
-                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\EquipmentContainer_results.xml", Encoding.Unicode);
+                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\ConnectivityNodes_results.xml", Encoding.Unicode);
                 xmlWriter.Formatting = Formatting.Indented;
 
                 while (resourcesLeft > 0)
@@ -833,14 +834,14 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 
                 GdaQueryProxy.IteratorClose(iteratorId);
 
-                message = "Successfully finished getting Equipment Containers";
-                Console.WriteLine(message);
+                message = "Successfully finished getting ConnectivityNodes";
+                //Console.WriteLine(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
             }
             catch (Exception e)
             {
-                message = string.Format("Getting Equipment Containers failed for {0}.\n\t{1}", modelCode, e.Message);
+                message = string.Format("Getting Connectivity Nodes failed for {0}.\n\t{1}", modelCode, e.Message);
                 Console.WriteLine(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
             }
@@ -857,16 +858,16 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
         }
 
 
-        private List<long> GetEquipmentFor(long sourceGID)
+        private List<long> GetTerminalsFor(long sourceGID)
         {
             Association association = new Association()
             {
-                PropertyId = ModelCode.EQUIPMENTCONTAINER_EQUIPMENTS,
-                Type = ModelCode.EQUIPMENT
+                PropertyId = ModelCode.CONNECTIVITYNODE_TERMINALS,
+                Type = ModelCode.TERMINAL
             };
 
-            string message = "Getting Equipments in Equipment Containers.";
-            Console.WriteLine(message);
+            string message = "Getting terminals for connectivity nodes.";
+            //Console.WriteLine(message);
             CommonTrace.WriteTrace(CommonTrace.TraceError, message);
 
             List<long> resultIds = new List<long>();
@@ -877,12 +878,12 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 
             try
             {
-                List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCode.EQUIPMENT);
+                List<ModelCode> properties = modelResourcesDesc.GetAllPropertyIds(ModelCode.TERMINAL);
 
                 int iteratorId = GdaQueryProxy.GetRelatedValues(sourceGID, properties, association);
                 int resourcesLeft = GdaQueryProxy.IteratorResourcesLeft(iteratorId);
 
-                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\Equipments_Results.xml", Encoding.Unicode);
+                xmlWriter = new XmlTextWriter(Config.Instance.ResultDirecotry + "\\Terminals_Results.xml", Encoding.Unicode);
                 xmlWriter.Formatting = Formatting.Indented;
 
                 while (resourcesLeft > 0)
@@ -891,6 +892,7 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 
                     for (int i = 0; i < rds.Count; i++)
                     {
+                        Console.WriteLine("{0}", rds[i].Id);
                         resultIds.Add(rds[i].Id);
                         rds[i].ExportToXml(xmlWriter);
                         xmlWriter.Flush();
@@ -901,13 +903,13 @@ namespace TelventDMS.Services.NetworkModelService.TestClient.Tests
 
                 GdaQueryProxy.IteratorClose(iteratorId);
 
-                message = "Getting Equipments successfully finished.";
-                Console.WriteLine(message);
+                message = "Getting terminals successfully finished.";
+                //Console.WriteLine(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
             }
             catch (Exception e)
             {
-                message = string.Format("Getting equipment for GlobalId = {0} and association (propertyId = {1}, type = {2}). Reason: {3}", sourceGID, association.PropertyId, association.Type, e.Message);
+                message = string.Format("Getting terminal for GlobalId = {0} and association (propertyId = {1}, type = {2}). Reason: {3}", sourceGID, association.PropertyId, association.Type, e.Message);
                 Console.WriteLine(message);
                 CommonTrace.WriteTrace(CommonTrace.TraceError, message);
             }
